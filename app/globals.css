@@ -1,0 +1,134 @@
+@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- ESTILOS LEGACY (Tus estilos originales) --- */
+.about {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.about h1 {
+  font-size: 2.5rem;
+  color: #222;
+}
+
+.about p {
+  max-width: 700px;
+  margin: 1rem auto;
+  color: #555;
+  line-height: 1.6;
+}
+
+.values {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 250px;
+}
+
+/* --- SISTEMA DE TEMA (MODERNO) --- */
+
+/* 1. VARIABLES MODO CLARO (DÍA) */
+:root {
+  --fondo: #ffffff;        /* Blanco */
+  --texto: #172554;        /* Azul Oscuro (Slate 950) */
+  --tarjeta-bg: #ffffff;   /* Blanco */
+  --tarjeta-borde: #e5e7eb; /* Gris claro */
+  
+  /* Botones en modo claro */
+  --btn-bg: #172554;       /* Botón oscuro */
+  --btn-text: #ffffff;     /* Texto blanco */
+  
+  /* Color de Acento (El azul vibrante del Hover) */
+  --brand-blue: #2563eb;   
+}
+
+/* 2. VARIABLES MODO OSCURO (NOCHE - Midnight Blue) */
+.dark {
+  --fondo: #020617;        /* Azul Noche Profundo (Slate 950) */
+  --texto: #f8fafc;        /* Blanco Suave */
+  --tarjeta-bg: #0f172a;   /* Azul Oscuro (Slate 900) */
+  --tarjeta-borde: #1e293b; /* Borde sutil */
+  
+  /* Botones en modo oscuro (Invertidos) */
+  --btn-bg: #ffffff;       /* Botón Blanco */
+  --btn-text: #020617;     /* Texto Oscuro */
+}
+
+/* 3. APLICACIÓN AL BODY */
+body {
+  background-color: var(--fondo);
+  color: var(--texto);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* --- CLASES DE UTILIDAD PARA TU PÁGINA --- */
+
+.bg-theme {
+  background-color: var(--fondo);
+}
+.text-theme {
+  color: var(--texto);
+}
+
+/* Tarjetas que cambian de color automáticamente */
+.card-theme {
+  background-color: var(--tarjeta-bg);
+  border: 1px solid var(--tarjeta-borde);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Bordes automáticos */
+.borde-theme {
+  border: 1px solid var(--tarjeta-borde);
+}
+
+/* --- EL BOTÓN MÁGICO (HOVER AZUL) --- */
+.theme-btn {
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  border: 1px solid transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Cuando pasas el mouse, se vuelve AZUL VIBRANTE con texto BLANCO */
+.theme-btn:hover {
+  background-color: var(--brand-blue) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.5); /* Glow azul */
+  transform: translateY(-2px);
+  border-color: var(--brand-blue);
+}
+
+.theme-btn:active {
+  transform: scale(0.98);
+}
+
+/* 6. CLASE PARA EL BOTÓN DE FLECHA (SECUNDARIO) */
+.btn-icon {
+  background-color: var(--tarjeta-bg); /* Fondo de la tarjeta */
+  color: var(--texto); /* <--- ESTO SOLUCIONA EL ERROR: Pinta el icono del color del texto */
+  border: 1px solid var(--tarjeta-borde);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon:hover {
+  background-color: var(--brand-blue); /* Azul al pasar el mouse */
+  color: #ffffff; /* Icono blanco al pasar el mouse */
+  border-color: var(--brand-blue);
+  transform: translateX(3px); /* Pequeño movimiento a la derecha */
+}
