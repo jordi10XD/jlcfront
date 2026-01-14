@@ -143,7 +143,7 @@ export default function TicketPage() {
                 </div>
               </div>
 
-              <div className="space-y-3 max-w-md mx-auto w-full">
+              <div className="space-y-3">
                 <label className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
                   <AlertCircle size={14} /> ¿Qué equipo presenta la falla?
                 </label>
