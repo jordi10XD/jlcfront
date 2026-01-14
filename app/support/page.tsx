@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from 'next/link';
 
 export default function SupportPage() {
   return (
@@ -125,7 +126,7 @@ export default function SupportPage() {
           </div>
         </section>
 
-        {/* ================= CTA FINAL ================= */}
+        {/* ================= CTA FINAL (ACTUALIZADO CON REDIRECCIÓN) ================= */}
         <section className="relative py-1 px-4">
           <div className="max-w-5xl mx-auto relative overflow-hidden rounded-[3rem] bg-blue-950 p-8 sm:p-20 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.5)] border border-white/10">
             <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.2),transparent_50%)] pointer-events-none" />
@@ -141,14 +142,18 @@ export default function SupportPage() {
               </div>
 
               <div className="flex flex-col gap-6">
-                <button className="group w-full flex items-center justify-between p-8 bg-white rounded-2xl hover:bg-blue-50 transition-all duration-300 hover:scale-[1.02] shadow-2xl text-blue-950 font-black uppercase tracking-widest text-sm">
+                {/* Ahora el botón es un componente Link que apunta a la ruta /ticket */}
+                <Link 
+                  href="/ticket"
+                  className="group w-full flex items-center justify-between p-8 bg-white rounded-2xl hover:bg-blue-50 transition-all duration-300 hover:scale-[1.02] shadow-2xl text-blue-950 font-black uppercase tracking-widest text-sm no-underline"
+                >
                   Solicitar Soporte Técnico
                   <div className="bg-blue-600 text-white p-2 rounded-xl group-hover:rotate-45 transition-transform">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={3} stroke="currentColor" className="w-6 h-6">
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
                     </svg>
                   </div>
-                </button>
+                </Link>
               </div>
             </div>
           </div>
