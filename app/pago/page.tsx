@@ -6,14 +6,10 @@ import Image from 'next/image';
 import { Oswald, Raleway } from 'next/font/google';
 import { useCart } from '../components/carcontext';
 import { useProducts } from '../components/productcontext';
-import api from '../../lib/api';
 import {
   ArrowLeft,
   CheckCircle,
   Smartphone,
-  MapPin,
-  User,
-  Mail,
   CreditCard,
   Plus,
   Loader2,
@@ -41,14 +37,15 @@ interface Product {
 
 export default function PagoPage() {
   const { cart, addToCart } = useCart() as { cart: CartItem[], addToCart: (p: any) => void };
-  const { products, uploadImage, isUploading } = useProducts() as {
-    products: Product[],
+  const { products, uploadImage, isUploading } = useProducts() as { 
+    products: Product[], 
     uploadImage: (file: File) => Promise<string | null>,
-    isUploading: boolean
+    isUploading: boolean 
   };
 
   const [mounted, setMounted] = useState(false);
   const [comprobanteUrl, setComprobanteUrl] = useState<string | null>(null);
+  
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -61,22 +58,26 @@ export default function PagoPage() {
     setMounted(true);
   }, []);
 
-  // FUNCIÓN DE PRECIO CORREGIDA (Elimina $ y asegura número)
+  // --- FUNCIÓN DE LIMPIEZA DE PRECIO ---
   const cleanPrice = (val: any): number => {
     if (typeof val === 'number') return val;
-    const cleaned = String(val).replace(/[^\d.-]/g, ''); // Solo deja números y puntos
+    if (!val) return 0;
+    // Convierte "$50.00" -> "50.00" -> 50
+    const cleaned = String(val).replace(/[^\d.-]/g, ''); 
     const parsed = parseFloat(cleaned);
     return isNaN(parsed) ? 0 : parsed;
   };
 
+  // --- CÁLCULO DE SUBTOTAL ---
   const subtotal = cart.reduce((sum: number, item: CartItem) => {
-    return sum + (cleanPrice(item.price) * (item.quantity || 1));
+    const precio = cleanPrice(item.price);
+    const cantidad = item.quantity || 1; // Si no hay cantidad, asume 1
+    return sum + (precio * cantidad);
   }, 0);
 
   const costoEnvio = 2.50;
   const total = subtotal + costoEnvio;
 
-  // SUGERENCIAS: Lógica más flexible para asegurar que se muestren
   const sugerencias = products
     .filter((p: Product) => !cart.some((c: CartItem) => String(c.id) === String(p.id)))
     .slice(0, 3);
@@ -100,9 +101,8 @@ export default function PagoPage() {
       return;
     }
 
-    const listaStr = cart.map(i => `• ${i.name} (x${i.quantity})`).join('\n');
-    const msg = `NUEVO PEDIDO JLC\n\nCLIENTE:\n${formData.nombre}\nEmail: ${formData.email}\nTeléfono: ${formData.telefono}\nDirección: ${formData.direccion}\n\nPEDIDO:\n${listaStr}\n\nTOTAL: $${total.toFixed(2)}\n\nPAGO:\n${comprobanteUrl}`;
-
+    const listaStr = cart.map(i => `• ${i.name} (x${i.quantity || 1})`).join('\n');
+    const msg = `NUEVO PEDIDO JLC\n\nCLIENTE:\n${formData.nombre}\nEmail: ${formData.email}\nTeléfono: ${formData.telefono}\nDirección: ${formData.direccion}\n\nPEDIDO:\n${listaStr}\n\nTOTAL A PAGAR: $${total.toFixed(2)}\n\nCOMPROBANTE:\n${comprobanteUrl}`;
 
     window.open(`https://wa.me/593993644934?text=${encodeURIComponent(msg)}`, '_blank');
   };
@@ -112,7 +112,6 @@ export default function PagoPage() {
   return (
     <div className={`min-h-screen bg-slate-50 pb-20 ${raleway.className}`}>
 
-      {/* HEADER AZUL PROFESIONAL */}
       <header className="bg-blue-950 text-white sticky top-0 z-50 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link href="/producto" className="flex items-center gap-2 hover:bg-blue-900 px-3 py-1 rounded-lg transition">
@@ -129,15 +128,13 @@ export default function PagoPage() {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
 
           <div className="lg:col-span-7 xl:col-span-8 space-y-6">
-
-            {/* FORMULARIO DE FACTURACIÓN */}
             <section className="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200">
               <h2 className={`text-2xl font-bold text-slate-800 mb-8 border-b pb-4 ${oswald.className}`}>1. INFORMACIÓN DE ENTREGA</h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Nombre Completo</label>
-                  <input type="text" name="nombre" placeholder="Escriba su nombre para la factura" required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none" onChange={handleInputChange} />
+                  <input type="text" name="nombre" placeholder="Nombre y Apellido" required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none" onChange={handleInputChange} />
                 </div>
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Correo Electrónico</label>
@@ -158,17 +155,14 @@ export default function PagoPage() {
               </div>
             </section>
 
-            {/* PAGO POR TRANSFERENCIA */}
             <section className="bg-white p-6 md:p-10 rounded-3xl shadow-sm border border-slate-200">
               <h2 className={`text-2xl font-bold text-slate-800 mb-8 border-b pb-4 ${oswald.className}`}>2. MÉTODO DE PAGO</h2>
-
               <div className="bg-blue-50 border border-blue-100 p-6 rounded-2xl mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="space-y-1">
-                  <p className="text-blue-900 font-bold text-lg">Banco Pichincha (Ahorros)</p>
+                  <p className="text-blue-900 font-bold text-lg flex items-center gap-2"><CreditCard size={20}/> Banco Pichincha (Ahorros)</p>
                   <p className="text-blue-700 text-sm italic">Luis Miguel Touriz Garnica | C.I. 2211974115</p>
                 </div>
               </div>
-
               <div className="relative">
                 <input type="file" id="up" className="hidden" accept="image/*" onChange={handleFileUpload} disabled={isUploading} />
                 <label htmlFor="up" className={`flex flex-col items-center justify-center p-10 border-2 border-dashed rounded-3xl cursor-pointer transition-all
@@ -185,29 +179,35 @@ export default function PagoPage() {
             </section>
           </div>
 
-          {/* BARRA LATERAL (TOTALES Y SUGERENCIAS) */}
           <div className="lg:col-span-5 xl:col-span-4 sticky top-24 space-y-6">
-
             <div className="bg-white rounded-[2rem] shadow-2xl border border-slate-100 overflow-hidden">
               <div className="bg-blue-950 text-white p-6 text-center">
                 <p className={`text-lg font-bold tracking-widest ${oswald.className}`}>RESUMEN DE COMPRA</p>
               </div>
 
-              <div className="p-6 max-h-[250px] overflow-y-auto divide-y divide-slate-100">
-                {cart.map((item) => (
-                  <div key={item.id} className="py-4 flex gap-4 items-center">
-                    <div className="w-14 h-14 bg-slate-50 rounded-xl relative border border-slate-100 flex-shrink-0">
-                      <Image src={item.image || '/logo.png'} alt={item.name} fill className="object-contain p-1" />
+              <div className="p-6 max-h-[300px] overflow-y-auto divide-y divide-slate-100">
+                {cart.length === 0 && <p className="text-center text-slate-400 py-4">Tu carrito está vacío</p>}
+                
+                {/* AQUÍ ESTABA EL ERROR VISUAL: Ahora usamos cleanPrice y protegemos quantity */}
+                {cart.map((item) => {
+                  const precioLimpio = cleanPrice(item.price);
+                  const cantidad = item.quantity || 1;
+                  
+                  return (
+                    <div key={item.id} className="py-4 flex gap-4 items-center">
+                      <div className="w-14 h-14 bg-slate-50 rounded-xl relative border border-slate-100 flex-shrink-0">
+                        <Image src={item.image || '/logo.png'} alt={item.name} fill className="object-contain p-1" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold text-slate-800 truncate">{item.name}</p>
+                        <p className="text-xs text-slate-400 font-medium">Cantidad: {cantidad}</p>
+                      </div>
+                      <p className="text-sm font-black text-slate-700">
+                        ${(precioLimpio * cantidad).toFixed(2)}
+                      </p>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-slate-800 truncate">{item.name}</p>
-                      <p className="text-xs text-slate-400 font-medium">Cantidad: {item.quantity}</p>
-                    </div>
-                    <p className="text-sm font-black text-slate-700">
-                      ${(cleanPrice(item.price) * item.quantity).toFixed(2)}
-                    </p>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="p-8 bg-slate-50 border-t space-y-3">
@@ -216,15 +216,15 @@ export default function PagoPage() {
                 <div className="flex justify-between text-2xl font-black text-blue-950 pt-4 border-t border-slate-200">
                   <span>TOTAL</span><span>${total.toFixed(2)}</span>
                 </div>
-                <button type="submit" disabled={isUploading || !comprobanteUrl}
+                
+                <button type="submit" disabled={isUploading || !comprobanteUrl || cart.length === 0}
                   className={`w-full py-5 mt-6 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all
-                            ${comprobanteUrl ? 'bg-green-600 text-white hover:bg-green-700 shadow-xl shadow-green-200' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
+                            ${comprobanteUrl && cart.length > 0 ? 'bg-green-600 text-white hover:bg-green-700 shadow-xl shadow-green-200' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
                   <Smartphone size={20} /> Finalizar Pedido
                 </button>
               </div>
             </div>
 
-            {/* SECCIÓN DE SUGERENCIAS RÁPIDAS (Restaurada y Mejorada) */}
             {sugerencias.length > 0 && (
               <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
                 <h3 className="text-[10px] font-black text-blue-900 mb-5 uppercase tracking-[0.2em] border-l-4 border-blue-900 pl-3">Sugerencias para ti</h3>
