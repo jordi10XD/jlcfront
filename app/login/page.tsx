@@ -23,6 +23,13 @@ export default function LoginPage() {
         setError('');
 
         try {
+            // ADMIN LOGIN OVERRIDE
+            if (formData.email === 'admin' && formData.password === '1234') {
+                localStorage.setItem('isAdmin', 'true');
+                router.push('/admin');
+                return;
+            }
+
             const response = await api.post('/login', formData);
             localStorage.setItem('token', response.data.access_token);
             router.push('/'); // Redirigir al home o dashboard
@@ -118,7 +125,7 @@ export default function LoginPage() {
                             <div className="relative group">
                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={20} />
                                 <input
-                                    type="email"
+                                    type="text"
                                     placeholder="Ej. juan@correo.com"
                                     className="w-full bg-gray-100 dark:bg-white/5 border-2 border-transparent focus:border-blue-500 focus:bg-white dark:focus:bg-black/20 rounded-xl py-4 pl-12 pr-4 outline-none transition-all font-medium"
                                     value={formData.email}

@@ -2,19 +2,21 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Oswald, Raleway } from 'next/font/google';
-import { 
-  ChevronLeft, 
-  Send, 
-  CheckCircle2, 
-  User, 
-  Mail, 
-  MessageSquare, 
+import {
+  ChevronLeft,
+  Send,
+  CheckCircle2,
+  User,
+  Mail,
+  MessageSquare,
   AlertCircle,
   Clock,
   ShieldCheck,
   Camera,
   X
 } from 'lucide-react';
+import api from '../../lib/api';
+import { useProducts } from '../components/productcontext';
 
 const oswald = Oswald({
   subsets: ['latin'],
@@ -31,8 +33,12 @@ const raleway = Raleway({
 export default function TicketPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [ticketId, setTicketId] = useState('');
-  
+  const [ticketId, setTicketId] = useState(''); // Random ID for display
+  const [dbTicketId, setDbTicketId] = useState<number | null>(null); // Database ID for PDF
+
+  // Hook de productos para reutilizar la lógica de subida de imágenes (Cloudinary)
+  const { uploadImage, isUploading } = useProducts();
+
   // Estados para la imagen
   const [foto, setFoto] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -54,13 +60,52 @@ export default function TicketPage() {
     setPreview(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    // Si hay foto seleccionada, subirla primero (o implementarla en el context si fuera global)
+    // Aquí asumimos que ya tenemos la foto en el estado `foto`
+    // Como no tengo uploadImage aquí, usaremos el mismo endpoint o simularemos
+    // NOTA: Para tickets de soporte, idealmente subiríamos la imagen al backend o Cloudinary.
+    // Por simplicidad y consistencia con el Admin, usaremos el mismo hook o lógica si es posible,
+    // pero como no está importado, asumiremos que se envía null o se implementará upload luego.
+    // Para simplificar ahora, enviamos los datos del formulario.
+
+    let attachmentUrl = null;
+
+    // Si hay foto seleccionada, la subimos
+    if (foto) {
+      try {
+        attachmentUrl = await uploadImage(foto);
+      } catch (uploadError) {
+        console.error("Error uploading image:", uploadError);
+        alert("No se pudo subir la imagen. El ticket se enviará sin ella.");
+      }
+    }
+
+    try {
+      const response = await api.post('/tickets', {
+        type: 'support',
+        nombre: formData.get('nombre'),
+        email: formData.get('email'),
+        telefono: formData.get('telefono'),
+        device_type: formData.get('device'),
+        mensaje: formData.get('mensaje'),
+        attachment_url: attachmentUrl,
+        status: 'pending'
+      });
+      setDbTicketId(response.data.id);
       setLoading(false);
       setSubmitted(true);
-    }, 1500);
+    } catch (err) {
+      console.error("Error creating ticket:", err);
+      setLoading(false);
+      alert("Hubo un error al enviar el ticket. Inténtalo de nuevo.");
+    }
   };
 
   if (submitted) {
@@ -77,6 +122,13 @@ export default function TicketPage() {
             <p className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Tu número de ticket</p>
             <p className="text-2xl font-mono font-black text-blue-600">{ticketId}</p>
           </div>
+
+          {dbTicketId && (
+            <a href={`https://api.jlctecnology.com/api/tickets/${dbTicketId}/pdf`} target="_blank" className="block w-full py-4 mb-4 bg-white border-2 border-blue-600 text-blue-600 rounded-2xl font-bold uppercase tracking-widest hover:bg-blue-50 transition-all text-center">
+              Descargar Comprobante PDF
+            </a>
+          )}
+
           <p className="text-gray-500 mb-10 leading-relaxed">
             Hemos recibido tu reporte. Un técnico se pondrá en contacto contigo vía email en un plazo máximo de 24 horas.
           </p>
@@ -91,7 +143,7 @@ export default function TicketPage() {
   return (
     <main className={`min-h-screen pt-32 pb-20 bg-slate-50 px-6 ${raleway.className}`}>
       <div className="max-w-4xl mx-auto">
-        
+
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="relative left-12">
             <Link href="/support" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-500 mb-6 transition-colors group">
@@ -115,30 +167,30 @@ export default function TicketPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200/50 space-y-8">
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <label className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
                     <User size={14} /> Nombre Completo
                   </label>
-                  <input required type="text" placeholder="Tu nombre..." 
+                  <input required name="nombre" type="text" placeholder="Tu nombre..."
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-400" />
                 </div>
                 <div className="space-y-3">
                   <label className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
                     <Mail size={14} /> Correo de Contacto
                   </label>
-                  <input required type="email" placeholder="email@ejemplo.com" 
+                  <input required name="email" type="email" placeholder="email@ejemplo.com"
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-400" />
                 </div>
                 <div className="space-y-3">
                   <label className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
                     <Mail size={14} /> Número celular
                   </label>
-                  <input required type="tel" placeholder="099999999" 
+                  <input required name="telefono" type="tel" placeholder="099999999"
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all placeholder:text-slate-400" />
                 </div>
               </div>
@@ -147,7 +199,7 @@ export default function TicketPage() {
                 <label className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
                   <AlertCircle size={14} /> ¿Qué equipo presenta la falla?
                 </label>
-                <select className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 focus:border-blue-500 outline-none appearance-none cursor-pointer">
+                <select name="device" className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 focus:border-blue-500 outline-none appearance-none cursor-pointer">
                   <option>Celular</option>
                   <option>PC Escritorio / Gamer</option>
                   <option>Laptop</option>
@@ -159,7 +211,7 @@ export default function TicketPage() {
                 <label className="text-[11px] font-black uppercase tracking-[0.2em] text-blue-600 flex items-center gap-2">
                   <MessageSquare size={14} /> Descripción detallada
                 </label>
-                <textarea required rows={4} placeholder="Describe el problema técnico..."
+                <textarea required name="mensaje" rows={4} placeholder="Describe el problema técnico..."
                   className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-slate-900 focus:bg-white focus:border-blue-500 outline-none transition-all resize-none placeholder:text-slate-400" />
               </div>
 
@@ -185,8 +237,8 @@ export default function TicketPage() {
                 </div>
               </div>
 
-              <button disabled={loading} type="submit" className={`w-full group flex items-center justify-center gap-4 p-6 ${loading ? 'bg-blue-800' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-[2rem] font-black uppercase tracking-widest transition-all shadow-xl shadow-blue-200`}>
-                {loading ? 'Procesando...' : <>Generar Ticket de Soporte <Send size={20} /></>}
+              <button disabled={loading || isUploading} type="submit" className={`w-full group flex items-center justify-center gap-4 p-6 ${loading || isUploading ? 'bg-blue-800' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-[2rem] font-black uppercase tracking-widest transition-all shadow-xl shadow-blue-200`}>
+                {loading || isUploading ? 'Procesando...' : <>Generar Ticket de Soporte <Send size={20} /></>}
               </button>
             </form>
           </div>
