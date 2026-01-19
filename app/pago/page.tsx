@@ -100,9 +100,10 @@ export default function PagoPage() {
     }
 
     const listaStr = cart.map(i => `• ${i.name} (x${i.quantity})`).join('\n');
-    const msg = `*NUEVO PEDIDO JLC*\n\n*CLIENTE:*\n👤 ${formData.nombre}\n📧 ${formData.email}\n📱 ${formData.telefono}\n📍 ${formData.direccion}\n\n*PEDIDO:*\n${listaStr}\n\n*TOTAL:* $${total.toFixed(2)}\n\n📎 *PAGO:* ${comprobanteUrl}`;
+    const msg = `NUEVO PEDIDO JLC\n\nCLIENTE:\n${formData.nombre}\nEmail: ${formData.email}\nTeléfono: ${formData.telefono}\nDirección: ${formData.direccion}\n\nPEDIDO:\n${listaStr}\n\nTOTAL: $${total.toFixed(2)}\n\nPAGO:\n${comprobanteUrl}`;
 
-    window.open(`https://wa.me/593999999999?text=${encodeURIComponent(msg)}`, '_blank');
+
+    window.open(`https://wa.me/593953887981?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   if (!mounted) return null;

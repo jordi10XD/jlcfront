@@ -132,3 +132,37 @@ body {
   border-color: var(--brand-blue);
   transform: translateX(3px); /* Pequeño movimiento a la derecha */
 }
+@keyframes fade {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade {
+  animation: fade 0.5s ease;
+}
+@keyframes branding-timer {
+  0% { width: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { width: 100%; opacity: 0; }
+}
+
+.animate-branding-timer {
+  animation: branding-timer 4000ms linear infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.animate-shake {
+  animation: shake 0.2s ease-in-out 0s 2;
+}

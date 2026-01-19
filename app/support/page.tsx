@@ -37,48 +37,11 @@ export default function SupportPage() {
 
         {/* ================= BLOQUES EDITORIALES ================= */}
         <section className="mb-32 space-y-24">
-          
-          {/* BLOQUE 1: DIAGNÓSTICO PRECISO */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="flex justify-start">
-              <div className="relative w-full max-w-md aspect-[3/4] overflow-hidden rounded-[2.5rem] shadow-2xl">
-                <Image src="/diagnostico.png" alt="Diagnóstico" fill className="object-cover" />
-              </div>
-            </div>
-            <div className="max-w-lg">
-              <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
-                Diagnóstico preciso.<br />
-                <span className="text-blue-500">Soluciones que perduran.</span>
-              </h2>
-              <p className="text-lg leading-relaxed opacity-70">
-                Cada proceso de soporte inicia con un análisis técnico profundo. Identificamos fallas reales tanto en hardware como en software, evitando soluciones temporales.
-              </p>
-            </div>
-          </div>
-
-          {/* BLOQUE 2: RENDIMIENTO OPTIMIZADO */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            <div className="max-w-lg md:order-1">
-              <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
-                Rendimiento,<br />
-                <span className="text-blue-500">sin sacrificar estabilidad.</span>
-              </h2>
-              <p className="text-lg leading-relaxed opacity-70">
-                Ajustamos el sistema para mejorar su fluidez y eficiencia, eliminando procesos innecesarios y configuraciones que afectan el rendimiento general de tus equipos.
-              </p>
-            </div>
-            <div className="flex justify-end md:order-2">
-              <div className="relative w-full max-w-md aspect-[3/4] overflow-hidden rounded-[2.5rem] shadow-2xl">
-                <Image src="/rendimiento.png" alt="Optimización" fill className="object-cover" />
-              </div>
-            </div>
-          </div>
-
           {/* BLOQUE 3: INGENIERÍA DE HARDWARE */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="flex justify-start">
               <div className="relative w-full max-w-md aspect-[3/4] overflow-hidden rounded-[2.5rem] shadow-2xl">
-                <Image src="/hardware.png" alt="Reparación de Hardware" fill className="object-cover" />
+                <Image src="/soporte2.jpeg" alt="Reparación de Hardware" fill className="object-cover" />
               </div>
             </div>
             <div className="max-w-lg">
@@ -97,6 +60,44 @@ export default function SupportPage() {
             </div>
           </div>
         </section>
+        
+          {/* BLOQUE 2: RENDIMIENTO OPTIMIZADO */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="max-w-lg md:order-1">
+              <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
+                Rendimiento,<br />
+                <span className="text-blue-500">sin sacrificar estabilidad.</span>
+              </h2>
+              <p className="text-lg leading-relaxed opacity-70">
+                Ajustamos el sistema para mejorar su fluidez y eficiencia, eliminando procesos innecesarios y configuraciones que afectan el rendimiento general de tus equipos.
+              </p>
+            </div>
+            <div className="flex justify-end md:order-2">
+              <div className="relative w-full max-w-md aspect-[3/4] overflow-hidden rounded-[2.5rem] shadow-2xl">
+                <Image src="/soporte1.jpeg" alt="Optimización" fill className="object-cover" />
+              </div>
+            </div>
+          </div>
+          
+          {/* BLOQUE 1: DIAGNÓSTICO PRECISO */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="flex justify-start">
+              <div className="relative w-full max-w-md aspect-[3/4] overflow-hidden rounded-[2.5rem] shadow-2xl">
+                <Image src="/soporte3.jpeg" alt="Diagnóstico" fill className="object-cover" />
+              </div>
+            </div>
+            <div className="max-w-lg">
+              <h2 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
+                Diagnóstico preciso.<br />
+                <span className="text-blue-500">Soluciones que perduran.</span>
+              </h2>
+              <p className="text-lg leading-relaxed opacity-70">
+                Cada proceso de soporte inicia con un análisis técnico profundo. Identificamos fallas reales tanto en hardware como en software, evitando soluciones temporales.
+              </p>
+            </div>
+          </div>
+
+        
 
         {/* ================= SECCIÓN DE CONFIANZA TÉCNICA ================= */}
         <section className="mb-1 py-10 border-y border-white/5">
