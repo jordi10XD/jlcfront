@@ -116,7 +116,7 @@ export default function ProductsPage() {
                   ${selectedCategory === 'ALL' ? product.span : 'col-span-1'}
                 `}
               >
-                <Link href={`/product/${product.id}`} className="flex flex-col h-full">
+                {/*<Link href={`/product/${product.id}`} className="flex flex-col h-full">*/}
                   
                   {/* IMAGEN */}
                   <div className="relative aspect-square w-full flex items-center justify-center p-10 overflow-hidden rounded-[2.5rem] border-b borde-theme" 
@@ -180,7 +180,7 @@ export default function ProductsPage() {
                       </button>
                     </div>
                   </div>
-                </Link>
+                {/*</Link>*/}
               </motion.div>
             ))}
           </AnimatePresence>
