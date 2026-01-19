@@ -3,15 +3,19 @@ import Link from 'next/link';
 import Footer from './components/Footer';
 import { useEffect, useState } from 'react';
 import api from '../lib/api';
+// 1. IMPORTAMOS EL HOOK DEL CARRITO
+import { useCart } from './components/carcontext'; 
 
 export default function Home() {
   const [trendingProducts, setTrendingProducts] = useState<any[]>([]);
+  
+  // 2. EXTRAEMOS LA FUNCIÓN PARA AÑADIR
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const fetchTrending = async () => {
       try {
         const response = await api.get('/products');
-        // Tomamos los primeros 4 como tendencia
         const mapped = response.data.slice(0, 4).map((p: any) => ({
           id: p.id,
           name: p.name,
@@ -28,11 +32,9 @@ export default function Home() {
   }, []);
 
   return (
-    // YA NO PONEMOS COLORES AQUÍ (bg-white, etc). El CSS global se encarga.
-    <main className="min-h-screen  font-sans selection:bg-blue-200 selection:text-blue-900">
+    <main className="min-h-screen font-sans selection:bg-blue-200 selection:text-blue-900">
       {/* ---------------- HERO SECTION ---------------- */}
       <section className="relative w-full h-[550px] flex items-center justify-center overflow-hidden">
-        {/* Fondo sutil degradado (Usamos opacidad para que se vea bien en oscuro y claro) */}
         <div className="absolute inset-0 bg-blue-500/5 z-0" />
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
@@ -70,50 +72,26 @@ export default function Home() {
       </section>
 
       {/* ---------------- BENEFICIOS ---------------- */}
-      {/* Usamos 'card-theme' que definimos en CSS para que cambie de color solo */}
       <section className="py-16">
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
           <Link href="/support">
             <div className="flex items-center gap-4 p-6 rounded-xl card-theme shadow-sm transition-all hover:scale-105">
               <div className="p-3 bg-blue-500/10 rounded-lg text-blue-500">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-8 h-8"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
                 </svg>
               </div>
-              <div >
+              <div>
                 <h3 className="font-bold text-lg">Garantía Asegurada</h3>
                 <p className="text-sm opacity-60">En todas tus reparaciones.</p>
               </div>
-
             </div>
           </Link>
           <Link href="/producto#lista_producto">
             <div className="flex items-center gap-4 p-6 rounded-xl card-theme shadow-sm transition-all hover:scale-105">
               <div className="p-3 bg-purple-500/10 rounded-lg text-purple-500">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-8 h-8"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0l-3-3m3 3l3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
                 </svg>
               </div>
               <div>
@@ -125,19 +103,8 @@ export default function Home() {
           <Link href="/producto">
             <div className="flex items-center gap-4 p-6 rounded-xl card-theme shadow-sm transition-all hover:scale-105">
               <div className="p-3 bg-green-500/10 rounded-lg text-green-500">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-8 h-8"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                  />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
               </div>
               <div>
@@ -157,7 +124,7 @@ export default function Home() {
             <p className="opacity-60">Lo más vendido de la semana.</p>
           </div>
           <Link
-            href="/produ"
+            href="/producto"
             className="text-blue-500 hover:text-blue-600 transition-colors flex items-center gap-2 font-semibold"
           >
             Ver todo <span>→</span>
@@ -182,9 +149,15 @@ export default function Home() {
                 </div>
                 <span className="font-bold text-lg">${item.price}</span>
               </div>
-              <button className="w-full mt-2 py-2.5 bg-blue-900 text-white font-bold rounded-lg hover:opacity-90 transition-colors shadow-sm">
+              
+              {/* 3. BOTÓN CON FUNCIONALIDAD DE AÑADIR */}
+              <button 
+                onClick={() => addToCart(item)}
+                className="w-full mt-2 py-2.5 bg-blue-900 text-white font-bold rounded-lg hover:opacity-90 transition-colors shadow-sm active:scale-95"
+              >
                 Añadir al Carrito
               </button>
+
             </div>
           )) : (
             <div className="col-span-4 text-center opacity-50">Cargando tendencias...</div>

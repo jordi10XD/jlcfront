@@ -188,6 +188,7 @@ export default function ProductsPage() {
       </main>
 
       {/* CARRITO FLOTANTE */}
+      <Link href="/pago" >
       <motion.div 
         whileHover={{ scale: 1.1, rotate: 5 }}
         whileTap={{ scale: 0.9 }}
@@ -200,7 +201,7 @@ export default function ProductsPage() {
           </span>
         )}
       </motion.div>
-
+        </Link>
       {/* MODAL */}
       <AnimatePresence>
         {selectedProduct && (
@@ -215,8 +216,13 @@ export default function ProductsPage() {
   );
 }
 
-// COMPONENTE MODAL
+// ==========================================
+// AQUÍ ESTÁ EL MODAL FUNCIONAL ACTUALIZADO
+// ==========================================
 function ProductModal({ product, onClose }: { product: any, onClose: () => void }) {
+  // 1. IMPORTANTE: Traemos el hook del carrito
+  const { addToCart } = useCart(); 
+
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
   };
@@ -271,12 +277,20 @@ function ProductModal({ product, onClose }: { product: any, onClose: () => void 
 
            <div className="flex gap-3">
              <Link 
-               href={`/product/${product.id}`}
+               href={`/producto/${product.id}`}
                className="flex-1 py-3 rounded-xl border-2 border-gray-100 dark:border-zinc-700 font-bold text-xs uppercase tracking-wider flex items-center justify-center hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
              >
                Ver Detalles
              </Link>
-             <button className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-500/30 transition-transform active:scale-95">
+             
+             {/* 2. BOTÓN "COMPRAR AHORA" FUNCIONAL */}
+             <button 
+                onClick={() => {
+                    addToCart(product); // Agrega el producto al carrito
+                    onClose();          // Cierra el modal
+                }}
+                className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-500/30 transition-transform active:scale-95"
+             >
                Comprar Ahora
              </button>
            </div>

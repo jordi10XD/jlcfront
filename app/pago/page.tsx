@@ -114,7 +114,7 @@ export default function PagoPage() {
       {/* HEADER AZUL PROFESIONAL */}
       <header className="bg-blue-950 text-white sticky top-0 z-50 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2 hover:bg-blue-900 px-3 py-1 rounded-lg transition">
+            <Link href="/producto" className="flex items-center gap-2 hover:bg-blue-900 px-3 py-1 rounded-lg transition">
                 <ArrowLeft size={18} /> <span className="text-xs font-bold uppercase tracking-widest">Tienda</span>
             </Link>
             <div className={`text-xl font-bold tracking-tighter flex items-center gap-2 ${oswald.className}`}>
