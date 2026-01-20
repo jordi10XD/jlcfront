@@ -273,7 +273,7 @@ function TicketListDisplay() {
           </div>
 
           <h3 className="font-bold text-lg mb-1">{t.nombre}</h3>
-          <p className="text-sm opacity-60 mb-3 flex items-center gap-2"><div className="w-1 h-1 bg-current rounded-full" /> {t.email}</p>
+          <div className="text-sm opacity-60 mb-3 flex items-center gap-2"><div className="w-1 h-1 bg-current rounded-full" /> {t.email}</div>
 
           {expanded === t.id && (
             <div className="mt-4 pt-4 border-t borde-theme text-sm space-y-4 animate-in slide-in-from-top-2">

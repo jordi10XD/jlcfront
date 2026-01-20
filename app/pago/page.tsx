@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Oswald, Raleway } from 'next/font/google';
 import { useCart } from '../components/carcontext';
 import { useProducts } from '../components/productcontext';
+import api from '../../lib/api';
 import {
   ArrowLeft,
   CheckCircle,
@@ -37,15 +38,15 @@ interface Product {
 
 export default function PagoPage() {
   const { cart, addToCart } = useCart() as { cart: CartItem[], addToCart: (p: any) => void };
-  const { products, uploadImage, isUploading } = useProducts() as { 
-    products: Product[], 
+  const { products, uploadImage, isUploading } = useProducts() as {
+    products: Product[],
     uploadImage: (file: File) => Promise<string | null>,
-    isUploading: boolean 
+    isUploading: boolean
   };
 
   const [mounted, setMounted] = useState(false);
   const [comprobanteUrl, setComprobanteUrl] = useState<string | null>(null);
-  
+
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -61,7 +62,7 @@ export default function PagoPage() {
   const cleanPrice = (val: any): number => {
     if (typeof val === 'number') return val;
     if (!val) return 0;
-    const cleaned = String(val).replace(/[^\d.-]/g, ''); 
+    const cleaned = String(val).replace(/[^\d.-]/g, '');
     const parsed = parseFloat(cleaned);
     return isNaN(parsed) ? 0 : parsed;
   };
@@ -102,9 +103,9 @@ export default function PagoPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (formData.cedula.length !== 10) {
       alert("La cédula debe tener exactamente 10 dígitos.");
       return;
@@ -120,10 +121,27 @@ export default function PagoPage() {
       return;
     }
 
-    const listaStr = cart.map(i => `• ${i.name} (x${i.quantity || 1})`).join('\n');
-    const msg = `NUEVO PEDIDO JLC\n\nCLIENTE:\n${formData.nombre}\nEmail: ${formData.email}\nTeléfono: ${formData.telefono}\nDirección: ${formData.direccion}\n\nPEDIDO:\n${listaStr}\n\nTOTAL A PAGAR: $${total.toFixed(2)}\n\nCOMPROBANTE:\n${comprobanteUrl}`;
+    try {
+      await api.post('/tickets', {
+        type: 'order',
+        nombre: formData.nombre,
+        email: formData.email,
+        telefono: formData.telefono,
+        cedula: formData.cedula,
+        direccion: formData.direccion,
+        items: cart,
+        total: total,
+        attachment_url: comprobanteUrl
+      });
 
-    window.open(`https://wa.me/593993644934?text=${encodeURIComponent(msg)}`, '_blank');
+      const listaStr = cart.map(i => `• ${i.name} (x${i.quantity || 1})`).join('\n');
+      const msg = `NUEVO PEDIDO JLC\n\nCLIENTE:\n${formData.nombre}\nEmail: ${formData.email}\nTeléfono: ${formData.telefono}\nDirección: ${formData.direccion}\n\nPEDIDO:\n${listaStr}\n\nTOTAL A PAGAR: $${total.toFixed(2)}\n\nCOMPROBANTE:\n${comprobanteUrl}`;
+
+      window.open(`https://wa.me/593993644934?text=${encodeURIComponent(msg)}`, '_blank');
+    } catch (error) {
+      console.error('Error al guardar pedido:', error);
+      alert('Hubo un error al procesar tu pedido. Intenta nuevamente.');
+    }
   };
 
   if (!mounted) return null;
@@ -178,7 +196,7 @@ export default function PagoPage() {
               <h2 className={`text-2xl font-bold text-slate-800 mb-8 border-b pb-4 ${oswald.className}`}>2. MÉTODO DE PAGO</h2>
               <div className="bg-blue-50 border border-blue-100 p-6 rounded-2xl mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="space-y-1">
-                  <p className="text-blue-900 font-bold text-lg flex items-center gap-2"><CreditCard size={20}/> Banco Pichincha (Ahorros)</p>
+                  <p className="text-blue-900 font-bold text-lg flex items-center gap-2"><CreditCard size={20} /> Banco Pichincha (Ahorros)</p>
                   <p className="text-blue-700 text-sm italic">Luis Miguel Touriz Garnica | C.I. 2211974115</p>
                 </div>
               </div>
@@ -206,11 +224,11 @@ export default function PagoPage() {
 
               <div className="p-6 max-h-[300px] overflow-y-auto divide-y divide-slate-100">
                 {cart.length === 0 && <p className="text-center text-slate-400 py-4">Tu carrito está vacío</p>}
-                
+
                 {cart.map((item, index) => {
                   const precioLimpio = cleanPrice(item.price);
                   const cantidad = item.quantity || 1;
-                  
+
                   return (
                     <div key={`${item.id}-${index}`} className="py-4 flex gap-4 items-center">
                       <div className="w-14 h-14 bg-slate-50 rounded-xl relative border border-slate-100 flex-shrink-0">
@@ -234,7 +252,7 @@ export default function PagoPage() {
                 <div className="flex justify-between text-2xl font-black text-blue-950 pt-4 border-t border-slate-200">
                   <span>TOTAL</span><span>${total.toFixed(2)}</span>
                 </div>
-                
+
                 <button type="submit" disabled={isUploading || !comprobanteUrl || cart.length === 0}
                   className={`w-full py-5 mt-6 rounded-2xl font-black uppercase tracking-widest flex items-center justify-center gap-3 transition-all
                             ${comprobanteUrl && cart.length > 0 ? 'bg-green-600 text-white hover:bg-green-700 shadow-xl shadow-green-200' : 'bg-slate-200 text-slate-400 cursor-not-allowed'}`}>
