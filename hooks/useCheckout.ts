@@ -10,7 +10,7 @@ export const useCheckout = () => {
     const handleCheckout = async (formData: { name: string; phone: string; email: string }) => {
         setLoading(true);
 
-        // 1. Preparamos los datos para Laravel
+        // 1. Preparamos los datos para Laravel-
         const orderPayload: OrderData = {
             customer_name: formData.name,
             customer_phone: formData.phone,
