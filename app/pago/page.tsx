@@ -188,13 +188,14 @@ export default function PagoPage() {
               <div className="p-6 max-h-[300px] overflow-y-auto divide-y divide-slate-100">
                 {cart.length === 0 && <p className="text-center text-slate-400 py-4">Tu carrito está vacío</p>}
                 
-                {/* AQUÍ ESTABA EL ERROR VISUAL: Ahora usamos cleanPrice y protegemos quantity */}
-                {cart.map((item) => {
+                {/* SOLUCIÓN AL ERROR DE KEY DUPLICADA */}
+                {cart.map((item, index) => {
                   const precioLimpio = cleanPrice(item.price);
                   const cantidad = item.quantity || 1;
                   
                   return (
-                    <div key={item.id} className="py-4 flex gap-4 items-center">
+                    // Aquí usamos item.id + index para garantizar unicidad
+                    <div key={`${item.id}-${index}`} className="py-4 flex gap-4 items-center">
                       <div className="w-14 h-14 bg-slate-50 rounded-xl relative border border-slate-100 flex-shrink-0">
                         <Image src={item.image || '/logo.png'} alt={item.name} fill className="object-contain p-1" />
                       </div>
