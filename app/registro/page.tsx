@@ -39,11 +39,18 @@ export default function RegisterPage() {
         password_confirmation: formData.confirmPassword
       });
 
+      // 1. Guardamos el token de seguridad (Laravel)
       localStorage.setItem('token', response.data.access_token);
-      // Opcional: Mostrar mensaje de éxito o redirigir
-      router.push('/');
+      
+      // 2. --- NUEVO: Guardamos el email para que el Navbar muestre el nombre ---
+      localStorage.setItem('userEmail', formData.email);
+      // -----------------------------------------------------------------------
+
+      // 3. Redirigimos usando window.location para actualizar el Navbar inmediatamente
+      window.location.href = '/';
+      
     } catch (err: any) {
-      if (err.response && err.response.data && err.response.data.errors) { // Estructura típica de Laravel
+      if (err.response && err.response.data && err.response.data.errors) { 
         setError(Object.values(err.response.data.errors).flat().join(', '));
       } else {
         setError('Error al registrarse. Inténtalo de nuevo.');
@@ -89,9 +96,8 @@ export default function RegisterPage() {
             transition={{ delay: 0.4, type: "spring" }}
             className="mt-12 relative h-64 w-full"
           >
-            {/* Puedes poner una imagen de tus productos aquí */}
             <Image
-              src="/audifonos_1.png" // Asegúrate que esta imagen exista o cámbiala
+              src="/audifonos_1.png" 
               alt="Product Showcase"
               fill
               className="object-contain drop-shadow-[0_20px_50px_rgba(59,130,246,0.5)]"

@@ -58,20 +58,17 @@ export default function PagoPage() {
     setMounted(true);
   }, []);
 
-  // --- FUNCIÓN DE LIMPIEZA DE PRECIO ---
   const cleanPrice = (val: any): number => {
     if (typeof val === 'number') return val;
     if (!val) return 0;
-    // Convierte "$50.00" -> "50.00" -> 50
     const cleaned = String(val).replace(/[^\d.-]/g, ''); 
     const parsed = parseFloat(cleaned);
     return isNaN(parsed) ? 0 : parsed;
   };
 
-  // --- CÁLCULO DE SUBTOTAL ---
   const subtotal = cart.reduce((sum: number, item: CartItem) => {
     const precio = cleanPrice(item.price);
-    const cantidad = item.quantity || 1; // Si no hay cantidad, asume 1
+    const cantidad = item.quantity || 1;
     return sum + (precio * cantidad);
   }, 0);
 
@@ -83,7 +80,18 @@ export default function PagoPage() {
     .slice(0, 3);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    // Validación para campos numéricos específicos
+    if (name === 'cedula' || name === 'telefono') {
+      const onlyNums = value.replace(/[^\d]/g, '');
+      if (name === 'cedula' && onlyNums.length > 10) return;
+      if (name === 'telefono' && onlyNums.length > 10) return;
+      setFormData({ ...formData, [name]: onlyNums });
+      return;
+    }
+
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,6 +104,17 @@ export default function PagoPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (formData.cedula.length !== 10) {
+      alert("La cédula debe tener exactamente 10 dígitos.");
+      return;
+    }
+
+    if (formData.telefono.length < 9) {
+      alert("Por favor, ingresa un número de teléfono válido.");
+      return;
+    }
+
     if (!comprobanteUrl) {
       alert("Por favor, sube el comprobante de pago para finalizar.");
       return;
@@ -134,23 +153,23 @@ export default function PagoPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="md:col-span-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Nombre Completo</label>
-                  <input type="text" name="nombre" placeholder="Nombre y Apellido" required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none" onChange={handleInputChange} />
+                  <input type="text" name="nombre" placeholder="Nombre y Apellido" required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none" onChange={handleInputChange} value={formData.nombre} />
                 </div>
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Correo Electrónico</label>
-                  <input type="email" name="email" placeholder="ejemplo@correo.com" required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none" onChange={handleInputChange} />
+                  <input type="email" name="email" placeholder="ejemplo@correo.com" required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none" onChange={handleInputChange} value={formData.email} />
                 </div>
                 <div>
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Teléfono / WhatsApp</label>
-                  <input type="tel" name="telefono" placeholder="099-999-9999" required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none" onChange={handleInputChange} />
+                  <input type="tel" name="telefono" placeholder="0999999999" required pattern="[0-9]{9,10}" title="Formato de teléfono no válido" className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none" onChange={handleInputChange} value={formData.telefono} />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Cédula o RUC</label>
-                  <input type="text" name="cedula" placeholder="Identificación fiscal" required className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none" onChange={handleInputChange} />
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Cédula o RUC (10 dígitos)</label>
+                  <input type="text" name="cedula" placeholder="Identificación fiscal" required minLength={10} maxLength={10} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none" onChange={handleInputChange} value={formData.cedula} />
                 </div>
                 <div className="md:col-span-2">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Dirección de Envío</label>
-                  <textarea name="direccion" placeholder="Ciudad, calle principal y referencias..." required rows={3} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none resize-none" onChange={handleInputChange} />
+                  <textarea name="direccion" placeholder="Ciudad, calle principal y referencias..." required rows={3} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-900 transition outline-none resize-none" onChange={handleInputChange} value={formData.direccion} />
                 </div>
               </div>
             </section>
@@ -188,13 +207,11 @@ export default function PagoPage() {
               <div className="p-6 max-h-[300px] overflow-y-auto divide-y divide-slate-100">
                 {cart.length === 0 && <p className="text-center text-slate-400 py-4">Tu carrito está vacío</p>}
                 
-                {/* SOLUCIÓN AL ERROR DE KEY DUPLICADA */}
                 {cart.map((item, index) => {
                   const precioLimpio = cleanPrice(item.price);
                   const cantidad = item.quantity || 1;
                   
                   return (
-                    // Aquí usamos item.id + index para garantizar unicidad
                     <div key={`${item.id}-${index}`} className="py-4 flex gap-4 items-center">
                       <div className="w-14 h-14 bg-slate-50 rounded-xl relative border border-slate-100 flex-shrink-0">
                         <Image src={item.image || '/logo.png'} alt={item.name} fill className="object-contain p-1" />
