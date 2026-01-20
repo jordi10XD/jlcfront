@@ -8,7 +8,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  withCredentials: true, // Importante para Sanctum SPA auth si usas cookies, o para CORS
+  withCredentials: false, // Importante para Sanctum SPA auth si usas cookies, o para CORS
 });
 
 // Interceptor para añadir el token a cada petición
